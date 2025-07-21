@@ -3,11 +3,11 @@ from typing import List, Dict, Any, Optional
 try:
     # When running as module
     from .tree_structure import ProblemCategory, ProblemSeverity
-    from .llm_integration import OpenAILLM
+    from .llm_integration import GeminiLLM
 except ImportError:
     # When running directly
     from tree_structure import ProblemCategory, ProblemSeverity
-    from llm_integration import OpenAILLM
+    from llm_integration import GeminiLLM
 import json
 import re
 
@@ -15,8 +15,8 @@ import re
 class ProblemClassifier:
     """사용자 입력과 에러 로그를 분석하여 문제 카테고리를 분류하는 시스템"""
     
-    def __init__(self, llm: Optional[OpenAILLM] = None):
-        self.llm = llm or OpenAILLM()
+    def __init__(self, llm: Optional[GeminiLLM] = None):
+        self.llm = llm or GeminiLLM()
     
     def classify_problem(self, 
                         user_input: str, 

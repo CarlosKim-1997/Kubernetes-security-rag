@@ -44,12 +44,21 @@ python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
-### 3. 벡터 저장소 초기화
+### 3. 환경 변수 설정
+```bash
+# Gemini API 키 설정
+export GEMINI_API_KEY="your_gemini_api_key_here"
+
+# Windows의 경우:
+# set GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+### 4. 벡터 저장소 초기화
 ```bash
 python src/vector_store.py
 ```
 
-### 4. API 서버 실행
+### 5. API 서버 실행
 ```bash
 python src/api_server.py
 ```

@@ -7,7 +7,7 @@ try:
     from .versioned_vector_store import VersionedKubernetesVectorStore
     from .yaml_analyzer import KubernetesYAMLAnalyzer
     from .schema import PolicyLevel, PodSecurityAnalysis, PolicyType
-    from .llm_integration import OpenAILLM
+    from .llm_integration import GeminiLLM
     from .crawler.version_manager import version_manager
 except ImportError:
     # When running directly
@@ -15,7 +15,7 @@ except ImportError:
     from versioned_vector_store import VersionedKubernetesVectorStore
     from yaml_analyzer import KubernetesYAMLAnalyzer
     from schema import PolicyLevel, PodSecurityAnalysis, PolicyType
-    from llm_integration import OpenAILLM
+    from llm_integration import GeminiLLM
     from crawler.version_manager import version_manager
 import yaml
 
@@ -25,13 +25,13 @@ class KubernetesSecurityRAG:
     
     def __init__(self, vector_store: Optional[KubernetesSecurityVectorStore] = None, 
                  versioned_vector_store: Optional[VersionedKubernetesVectorStore] = None,
-                 llm: Optional[OpenAILLM] = None):
+                 llm: Optional[GeminiLLM] = None):
         """Initialize the RAG system"""
         self.vector_store = vector_store or KubernetesSecurityVectorStore()
         self.versioned_vector_store = versioned_vector_store or VersionedKubernetesVectorStore()
         self.yaml_analyzer = KubernetesYAMLAnalyzer()
         if llm is None:
-            self.llm = OpenAILLM()
+            self.llm = GeminiLLM()
         else:
             self.llm = llm  # Optional LLM integration
         

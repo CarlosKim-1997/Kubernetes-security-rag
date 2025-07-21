@@ -5,13 +5,13 @@ try:
     from .tree_structure import ProblemTree, CheckItem, ProblemCategory, ProblemSeverity, TreeBuilder
     from .problem_classifier import ProblemClassifier
     from .vector_store import KubernetesSecurityVectorStore
-    from .llm_integration import OpenAILLM
+    from .llm_integration import GeminiLLM
 except ImportError:
     # When running directly
     from tree_structure import ProblemTree, CheckItem, ProblemCategory, ProblemSeverity, TreeBuilder
     from problem_classifier import ProblemClassifier
     from vector_store import KubernetesSecurityVectorStore
-    from llm_integration import OpenAILLM
+    from llm_integration import GeminiLLM
 import uuid
 from datetime import datetime
 
@@ -21,10 +21,10 @@ class ChecklistGenerator:
     
     def __init__(self, 
                  vector_store: Optional[KubernetesSecurityVectorStore] = None,
-                 llm: Optional[OpenAILLM] = None,
+                 llm: Optional[GeminiLLM] = None,
                  classifier: Optional[ProblemClassifier] = None):
         self.vector_store = vector_store or KubernetesSecurityVectorStore()
-        self.llm = llm or OpenAILLM()
+        self.llm = llm or GeminiLLM()
         self.classifier = classifier or ProblemClassifier(llm)
     
     def generate_checklist(self, 

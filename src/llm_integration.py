@@ -1,32 +1,32 @@
 import os
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-class OpenAILLM:
+class GeminiLLM:
     """
-    OpenAI LLM Integration Module (Korean Response Support)
+    Gemini LLM Integration Module (Korean Response Support)
     Generates all responses in Korean, practically and friendly.
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo"):
-        """Initialize OpenAI API key and model."""
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-1.5-flash"):
+        """Initialize Gemini API key and model."""
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
-            raise ValueError("OpenAI API key is required. Set OPENAI_API_KEY environment variable or pass api_key parameter.")
-        # Initialize OpenAI client with safe configuration
+            raise ValueError("Gemini API key is required. Set GEMINI_API_KEY environment variable or pass api_key parameter.")
+        # Initialize Gemini client with safe configuration
         try:
-            # Set environment variable for OpenAI client
-            os.environ["OPENAI_API_KEY"] = self.api_key
-            self.client = OpenAI()
+            # Configure Gemini API
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel(model)
         except Exception as e:
-            print(f"Warning: OpenAI client initialization failed: {e}")
+            print(f"Warning: Gemini client initialization failed: {e}")
             # Create a dummy client for fallback
-            self.client = None
-        self.model = model
+            self.model = None
+        self.model_name = model
     
     def generate_security_advice(self, 
                                analysis_results: List[Dict[str, Any]],
@@ -79,21 +79,12 @@ class OpenAILLM:
 
 답변은 실무자가 바로 복사해 쓸 수 있을 정도로 구체적이고, 불필요한 반복/원론적 설명은 피하세요.
 """
-        if not self.client:
-            return "[Error] OpenAI client is not available. Please check your API key and network connection."
+        if not self.model:
+            return "[Error] Gemini client is not available. Please check your API key and network connection."
         
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "당신은 쿠버네티스 보안 전문가입니다. 모든 답변을 실무적으로, 중복 없이 간결하게, 구체적 예시와 우선순위를 강조해서 작성하세요."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=1000,
-                temperature=0.3
-            )
-            content = response.choices[0].message.content if response.choices[0].message else None
-            return content.strip() if content else "[Error] LLM 응답이 비어 있습니다."
+            response = self.model.generate_content(prompt)
+            return response.text.strip() if response.text else "[Error] LLM 응답이 비어 있습니다."
         except Exception as e:
             return f"[Error] LLM security advice generation failed: {str(e)}"
     
@@ -130,21 +121,12 @@ class OpenAILLM:
 
 컨텍스트에 답이 없으면, 일반적인 보안 베스트 프랙티스도 한두 줄로 안내하세요.
 """
-        if not self.client:
-            return "[Error] OpenAI client is not available. Please check your API key and network connection."
+        if not self.model:
+            return "[Error] Gemini client is not available. Please check your API key and network connection."
         
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "당신은 쿠버네티스 보안 전문가입니다. 모든 답변을 실무적으로, 중복 없이 간결하게, 구체적 예시와 우선순위를 강조해서 작성하세요."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=800,
-                temperature=0.3
-            )
-            content = response.choices[0].message.content if response.choices[0].message else None
-            return content.strip() if content else "[Error] LLM 응답이 비어 있습니다."
+            response = self.model.generate_content(prompt)
+            return response.text.strip() if response.text else "[Error] LLM 응답이 비어 있습니다."
         except Exception as e:
             return f"[Error] LLM question response generation failed: {str(e)}"
     
@@ -184,21 +166,12 @@ class OpenAILLM:
 
 답변은 실무자가 바로 복사해 쓸 수 있을 정도로 구체적이고, 불필요한 반복/원론적 설명은 피하세요.
 """
-        if not self.client:
-            return "[Error] OpenAI client is not available. Please check your API key and network connection."
+        if not self.model:
+            return "[Error] Gemini client is not available. Please check your API key and network connection."
         
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "당신은 쿠버네티스 보안 전문가입니다. 모든 답변을 실무적으로, 중복 없이 간결하게, 구체적 예시와 우선순위를 강조해서 작성하세요."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=1000,
-                temperature=0.3
-            )
-            content = response.choices[0].message.content if response.choices[0].message else None
-            return content.strip() if content else "[Error] LLM 응답이 비어 있습니다."
+            response = self.model.generate_content(prompt)
+            return response.text.strip() if response.text else "[Error] LLM 응답이 비어 있습니다."
         except Exception as e:
             return f"[Error] LLM field guidance generation failed: {str(e)}"
     
@@ -235,20 +208,14 @@ class OpenAILLM:
 1. 모든 치명적/경고 이슈를 반영한 수정된 YAML만 출력 (설명 없이 YAML만)
 2. YAML은 실제 적용 가능한 형태로 출력
 """
-        if not self.client:
-            return "[Error] OpenAI client is not available. Please check your API key and network connection."
+        if not self.model:
+            return "[Error] Gemini client is not available. Please check your API key and network connection."
         
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "당신은 쿠버네티스 보안 전문가입니다. 모든 답변을 한국어로, 실무적으로, 친절하게 작성하세요."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=1500,
-                temperature=0.2
-            )
-            content = response.choices[0].message.content if response.choices[0].message else None
-            return content.strip() if content else "[Error] LLM 응답이 비어 있습니다."
+            response = self.model.generate_content(prompt)
+            return response.text.strip() if response.text else "[Error] LLM 응답이 비어 있습니다."
         except Exception as e:
-            return f"[Error] LLM YAML fix generation failed: {str(e)}" 
+            return f"[Error] LLM YAML fix generation failed: {str(e)}"
+
+# Backward compatibility - alias for OpenAILLM
+OpenAILLM = GeminiLLM 
